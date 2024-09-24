@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class Client {
 	
-	BufferedReader reader;
+    BufferedReader reader;
     BufferedWriter writer;
 
 	// Quando um client é instanciado, então uma conexão com o servidor é aberta para escuta e escrita de dados.
