@@ -8,8 +8,10 @@ public class Server implements Runnable {
     
     Socket socket;
     
-    public static Vector client = new Vector();
+    //atributo estatico, ou seja, é compartilhado por todas as instancias de Server
+    public static Vector client = new Vector(); // vetor de envio de dados aos clientes
     
+    //O Server recebe o objeto socket que representa a conexão com um cliente e armazena na variavel socket da classe
     public Server (Socket socket) {
         try {
             this.socket = socket;
@@ -18,12 +20,18 @@ public class Server implements Runnable {
         }
     }
     
+    //O metodo run será executado sempre que o Servidor aceitar uma nova conexão
     public void run() {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        	
+        	//lê as mensagens dos clientes
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
             
-            client.add(writer);
+          //envia mensagem a todos os clientes conectados
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); 
+            
+            //Adiciona o meio de comunicação com um novo cliente ao array de clientes
+            Server.client.add(writer);
             
             while(true) {
                 String data = reader.readLine().trim();
@@ -44,15 +52,23 @@ public class Server implements Runnable {
             e.printStackTrace();
         }
     }
+    
+    /*
+     * As threads são essencias para que haja comunicação simultanea entre os clientes
+     * pois, cada conexão com um cliente gera uma thread que roda o metodo run() da interface runnable
+     * Esse metodo, por sua vez é reponsavel por escutar um cliente e enviar mensagens a todos os outros
+     * de forma paralela, havendo assim, multiplas conexões funcionando de forma fluida e continua.
+     * */
 
 
     public static void main(String[] args) throws Exception {
         ServerSocket s = new ServerSocket(12000);
         while(true) {
-            Socket socket = s.accept();
-            Server server = new Server(socket);
-            Thread thread = new Thread(server);
-            thread.start();
+            Socket socket = s.accept(); // aceita a conexão de um cliente
+            Server server = new Server(socket); // cria um objeto Server para o cliente conectado
+            Thread thread = new Thread(server); // cria uma nova thread para o cliente
+            thread.start(); // inicia a thread
         }
     }
+
 }
